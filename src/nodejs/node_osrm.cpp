@@ -282,7 +282,7 @@ inline void asyncForTiles(const Nan::FunctionCallbackInfo<v8::Value> &info,
  * @param {String} [options.geometries=polyline] Returned route geometry format (influences overview and per step). Can also be `geojson`.
  * @param {String} [options.overview=simplified] Add overview geometry either `full`, `simplified` according to highest zoom level it could be display on, or not at all (`false`).
  * @param {Boolean} [options.continue_straight] Forces the route to keep going straight at waypoints and don't do a uturn even if it would be faster. Default value depends on the profile.
- * @param {Array} [options.approaches] Keep waypoints on curb side. Can be `null` (unrestricted, default) or `curb`.
+ * @param {Array} [options.approaches] Keep waypoints on curb or opposite side of the road. Can be `null` (unrestricted, default), `curb` or `opposite`.
  *                  `null`/`true`/`false`
  * @param {Function} callback
  *
@@ -318,7 +318,7 @@ NAN_METHOD(Engine::route) //
  * @param {Array} [options.hints] Hints for the coordinate snapping. Array of base64 encoded strings.
  * @param {Number} [options.number=1] Number of nearest segments that should be returned.
  * Must be an integer greater than or equal to `1`.
- * @param {Array} [options.approaches] Keep waypoints on curb side. Can be `null` (unrestricted, default) or `curb`.
+ * @param {Array} [options.approaches] Keep waypoints on curb or opposite side of the road. Can be `null` (unrestricted, default), `curb` or `opposite`.
  * @param {Function} callback
  *
  * @returns {Object} containing `waypoints`.
@@ -358,7 +358,7 @@ NAN_METHOD(Engine::nearest) //
  * @param {Array} [options.sources] An array of `index` elements (`0 <= integer < #coordinates`) to use
  *                                  location with given index as source. Default is to use all.
  * @param {Array} [options.destinations] An array of `index` elements (`0 <= integer < #coordinates`) to use location with given index as destination. Default is to use all.
- * @param {Array} [options.approaches] Keep waypoints on curb side. Can be `null` (unrestricted, default) or `curb`.
+ * @param {Array} [options.approaches] Keep waypoints on curb or opposite side of the road. Can be `null` (unrestricted, default), `curb` or `opposite`.
  * @param {Array} [options.annotations] An array of the table types to return. Values can be `duration` or `distance` or both. If no annotations parameter is added, the default is to return the `durations` table. If `annotations=distance` or `annotations=duration,distance` is requested when running a MLD router, a `NotImplemented` error will be returned.
 
  * @param {Function} callback
@@ -517,7 +517,7 @@ NAN_METHOD(Engine::match) //
  * @param {Boolean} [options.roundtrip=true] Return route is a roundtrip.
  * @param {String} [options.source=any] Return route starts at `any` or `first` coordinate.
  * @param {String} [options.destination=any] Return route ends at `any` or `last` coordinate.
- * @param {Array} [options.approaches] Keep waypoints on curb side. Can be `null` (unrestricted, default) or `curb`.
+ * @param {Array} [options.approaches] Keep waypoints on curb or opposite side of the road. Can be `null` (unrestricted, default), `curb` or `opposite`.
  *
  * @returns {Object} containing `waypoints` and `trips`.
  * **`waypoints`**: an array of [`Waypoint`](#waypoint) objects representing all waypoints in input order.
