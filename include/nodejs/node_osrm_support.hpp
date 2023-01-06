@@ -490,19 +490,23 @@ inline bool argumentsToParameter(const Nan::FunctionCallbackInfo<v8::Value> &arg
                 {
                     params->approaches.push_back(osrm::Approach::CURB);
                 }
+                else if (approach_str == "opposite")
+                {
+                    params->approaches.push_back(osrm::Approach::OPPOSITE);
+                }
                 else if (approach_str == "unrestricted")
                 {
                     params->approaches.push_back(osrm::Approach::UNRESTRICTED);
                 }
                 else
                 {
-                    Nan::ThrowError("'approaches' param must be one of [curb, unrestricted]");
+                    Nan::ThrowError("'approaches' param must be one of [curb, opposite, unrestricted]");
                     return false;
                 }
             }
             else
             {
-                Nan::ThrowError("Approach must be a string: [curb, unrestricted] or null");
+                Nan::ThrowError("Approach must be a string: [curb, opposite, unrestricted] or null");
                 return false;
             }
         }
