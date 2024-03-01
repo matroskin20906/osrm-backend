@@ -49,7 +49,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  osrm::engine::api::ResultT &response) const
@@ -67,7 +67,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  flatbuffers::FlatBufferBuilder &fb_result) const
@@ -122,14 +122,14 @@ class TableAPI final : public BaseAPI
         flatbuffers::Offset<flatbuffers::Vector<float>> durations;
         if (use_durations)
         {
-            durations = MakeDurationTable(fb_result, tables.first);
+            durations = MakeDurationTable(fb_result, std::get<0>(tables));
         }
 
         bool use_distances = parameters.annotations & TableParameters::AnnotationsType::Distance;
         flatbuffers::Offset<flatbuffers::Vector<float>> distances;
         if (use_distances)
         {
-            distances = MakeDistanceTable(fb_result, tables.second);
+            distances = MakeDistanceTable(fb_result, std::get<1>(tables));
         }
 
         bool have_speed_cells =
@@ -169,7 +169,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  util::json::Object &response) const
@@ -214,13 +214,15 @@ class TableAPI final : public BaseAPI
         if (parameters.annotations & TableParameters::AnnotationsType::Duration)
         {
             response.values["durations"] =
-                MakeDurationTable(tables.first, number_of_sources, number_of_destinations);
+                MakeDurationTable(std::get<0>(tables), number_of_sources, number_of_destinations);
         }
 
         if (parameters.annotations & TableParameters::AnnotationsType::Distance)
         {
             response.values["distances"] =
-                MakeDistanceTable(tables.second, number_of_sources, number_of_destinations);
+                MakeDistanceTable(std::get<1>(tables), number_of_sources, number_of_destinations);
+            response.values["weights"] =
+                MakeWeightTable(std::get<2>(tables), number_of_sources, number_of_destinations);
         }
 
         if (parameters.fallback_speed != INVALID_FALLBACK_SPEED && parameters.fallback_speed > 0)
@@ -396,6 +398,34 @@ class TableAPI final : public BaseAPI
                                // round to single decimal place
                                return util::json::Value(
                                    util::json::Number(std::round(distance * 10) / 10.));
+                           });
+            json_table.values.push_back(std::move(json_row));
+        }
+        return json_table;
+    }
+
+    virtual util::json::Array MakeWeightTable(const std::vector<EdgeWeight> &values,
+                                                std::size_t number_of_rows,
+                                                std::size_t number_of_columns) const
+    {
+        util::json::Array json_table;
+        for (const auto row : util::irange<std::size_t>(0UL, number_of_rows))
+        {
+            util::json::Array json_row;
+            auto row_begin_iterator = values.begin() + (row * number_of_columns);
+            auto row_end_iterator = values.begin() + ((row + 1) * number_of_columns);
+            json_row.values.resize(number_of_columns);
+            std::transform(row_begin_iterator,
+                           row_end_iterator,
+                           json_row.values.begin(),
+                           [](const EdgeWeight weight) {
+                               if (weight == INVALID_EDGE_WEIGHT)
+                               {
+                                   return util::json::Value(util::json::Null());
+                               }
+                               // round to single decimal place
+                               return util::json::Value(
+                                   util::json::Number(weight / 10.));
                            });
             json_table.values.push_back(std::move(json_row));
         }

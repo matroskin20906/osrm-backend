@@ -211,7 +211,7 @@ void relaxOutgoingEdges(
 // Unidirectional multi-layer Dijkstra search for 1-to-N and N-to-1 matrices
 //
 template <bool DIRECTION>
-std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>>
 oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                 const DataFacade<Algorithm> &facade,
                 const std::vector<PhantomNodeCandidates> &candidates_list,
@@ -399,7 +399,7 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
             facade, heapNode, query_heap, candidates_list, source_index, target_indices);
     }
 
-    return std::make_pair(std::move(durations_table), std::move(distances_table));
+    return std::make_tuple(std::move(durations_table), std::move(distances_table), std::move(weights_table));
 }
 
 //
@@ -528,7 +528,7 @@ void retrievePackedPathFromSearchSpace(NodeID middle_node_id,
 }
 
 template <bool DIRECTION>
-std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>>
 manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                  const DataFacade<Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,
@@ -608,7 +608,7 @@ manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
         }
     }
 
-    return std::make_pair(std::move(durations_table), std::move(distances_table));
+    return std::make_tuple(std::move(durations_table), std::move(distances_table), std::move(weights_table));
 }
 
 } // namespace mld
@@ -626,7 +626,7 @@ manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
 //   then search is performed on a reversed graph with phantom nodes with flipped roles and
 //   returning a transposed matrix.
 template <>
-std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeWeight>>
 manyToManySearch(SearchEngineData<mld::Algorithm> &engine_working_data,
                  const DataFacade<mld::Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,
