@@ -221,6 +221,9 @@ class TableAPI final : public BaseAPI
         {
             response.values["distances"] =
                 MakeDistanceTable(std::get<1>(tables), number_of_sources, number_of_destinations);
+        }
+        if (parameters.annotations & TableParameters::AnnotationsType::Weight)
+        {
             response.values["weights"] =
                 MakeWeightTable(std::get<2>(tables), number_of_sources, number_of_destinations);
         }

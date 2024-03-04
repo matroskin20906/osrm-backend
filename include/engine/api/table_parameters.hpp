@@ -74,6 +74,7 @@ struct TableParameters : public BaseParameters
         None = 0,
         Duration = 0x01,
         Distance = 0x02,
+        Weight = 0x03,
         All = Duration | Distance
     };
 
