@@ -32,6 +32,7 @@ struct StepManeuver
 
     WaypointType waypoint_type;
     unsigned exit;
+    short degrees;
 };
 
 inline StepManeuver getInvalidStepManeuver()
@@ -41,6 +42,7 @@ inline StepManeuver getInvalidStepManeuver()
             0,
             osrm::guidance::TurnInstruction::NO_TURN(),
             WaypointType::None,
+            0,
             0};
 }
 

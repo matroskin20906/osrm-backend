@@ -113,8 +113,10 @@ util::json::Object makeStepManeuver(const guidance::StepManeuver &maneuver)
     step_maneuver.values["location"] = detail::coordinateToLonLat(maneuver.location);
     step_maneuver.values["bearing_before"] = detail::roundAndClampBearing(maneuver.bearing_before);
     step_maneuver.values["bearing_after"] = detail::roundAndClampBearing(maneuver.bearing_after);
-    if (maneuver.exit != 0)
+    if (maneuver.exit != 0) {
         step_maneuver.values["exit"] = maneuver.exit;
+        step_maneuver.values["degrees"] = maneuver.degrees;
+    }
 
     return step_maneuver;
 }

@@ -86,6 +86,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                           bearings.second,
                           osrm::guidance::TurnInstruction::NO_TURN(),
                           WaypointType::Depart,
+                          0,
                           0};
 
     IntermediateIntersection intersection{source_node.location,
@@ -226,6 +227,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                             bearings.second,
                             turn_instruction,
                             WaypointType::None,
+                            0,
                             0};
                 segment_index++;
                 segment_duration = 0;
@@ -323,6 +325,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                 bearings.second,
                 osrm::guidance::TurnInstruction::NO_TURN(),
                 WaypointType::Arrive,
+                0,
                 0};
 
     BOOST_ASSERT(!leg_geometry.locations.empty());
