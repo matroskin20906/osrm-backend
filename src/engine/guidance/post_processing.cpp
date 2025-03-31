@@ -194,14 +194,6 @@ std::vector<RouteStep> handleRoundabouts(std::vector<RouteStep> steps)
     // but it is the best we can do
     bool currently_on_roundabout = !entersRoundabout(first_roundabout_type->maneuver.instruction);
 
-    // this group by paradigm does might contain intermediate roundabout instructions, when they are
-    // directly connected. Otherwise it will be a sequence containing everything from enter to exit.
-    // If we already start on the roundabout, the first valid place will be steps.begin().
-    for (size_t i = 0; i < steps.size(); ++i) {
-        util::Log(logINFO) << " enter: " << entersRoundabout(steps[i].maneuver.instruction) << " exit: " << leavesRoundabout(steps[i].maneuver.instruction) << " degrees: " << steps[i].maneuver.degrees
- << " bearing before " << steps[i].maneuver.bearing_before << " bearing after " << steps[i].maneuver.bearing_after;
-    }
-
     short bearing_before_roundabout = 0;
     short roundabout_enter = 0;
     const short SMALL_BEARING_CHANGE = 15;
@@ -222,7 +214,6 @@ std::vector<RouteStep> handleRoundabouts(std::vector<RouteStep> steps)
                 if (abs(steps[j].maneuver.bearing_after - steps[j].maneuver.bearing_before) < SMALL_BEARING_CHANGE) {
                     continue;
                 }
-                util::Log(logINFO) << " bearing before roundabout " << bearing_before_roundabout << " bearing after roundabout " << steps[j].maneuver.bearing_before;
                 steps[i].maneuver.degrees = (180 - (steps[j].maneuver.bearing_before - bearing_before_roundabout)) % 360;
                 if (steps[i].maneuver.degrees < 0) {
                     steps[i].maneuver.degrees = 360 + steps[i].maneuver.degrees;
@@ -232,10 +223,10 @@ std::vector<RouteStep> handleRoundabouts(std::vector<RouteStep> steps)
             }
         }
     }
-    for (size_t i = 0; i < steps.size(); ++i) {
-        util::Log(logINFO) << " enter: " << entersRoundabout(steps[i].maneuver.instruction) << " exit: " << leavesRoundabout(steps[i].maneuver.instruction) << " degrees: " << steps[i].maneuver.degrees << " bearing before " << steps[i].maneuver.bearing_before << " bearing after " << steps[i].maneuver.bearing_after;
-    }
 
+    // this group by paradigm does might contain intermediate roundabout instructions, when they are
+    // directly connected. Otherwise it will be a sequence containing everything from enter to exit.
+    // If we already start on the roundabout, the first valid place will be steps.begin().
     const auto is_on_roundabout = [&currently_on_roundabout](const auto &step) {
         if (currently_on_roundabout)
         {
