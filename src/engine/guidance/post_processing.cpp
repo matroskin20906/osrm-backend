@@ -177,7 +177,8 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, short roundabout_
             size_t in_index = steps[i].intersections[j].in;
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
                 if (
-                    (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[out_index]) < 65)
+                    !steps[i].intersections[j].entry[k]
+                    && (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[out_index]) < 65)
                     && steps[i].intersections[j].bearings[k] < steps[i].intersections[j].bearings[out_index]
                 ) {
                     // due to "in" format + 180 is needed to get real angle.
@@ -202,7 +203,8 @@ short getBearingAfterRoundabout(std::vector<RouteStep> steps, short roundabout_e
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
 
                 if (
-                    (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[in_index]) < 65)
+                    !steps[i].intersections[j].entry[k]
+                    && (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[in_index]) < 65)
                     && steps[i].intersections[j].bearings[k] > steps[i].intersections[j].bearings[in_index]
                 ) {
                     return steps[i].intersections[j].bearings[out_index];
