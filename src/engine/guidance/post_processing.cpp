@@ -181,10 +181,16 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_en
             size_t out_index = steps[i].intersections[j].out;
             size_t in_index = steps[i].intersections[j].in;
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
+                short bearing_left = steps[i].intersections[j].bearings[k];
+                short bearing_right = steps[i].intersections[i].bearings[out_index];
+
+                if (bearing_left > bearing_right) {
+                    bearing_right += 360;
+                }
+
                 if (
                     !steps[i].intersections[j].entry[k]
-                    && (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[out_index]) < 65)
-                    && steps[i].intersections[j].bearings[k] < steps[i].intersections[j].bearings[out_index]
+                    && (bearing_right - bearing_left < 65)
                 ) {
                     // due to "in" format + 180 is needed to get real angle.
                     return (steps[i].intersections[j].bearings[in_index] + 180) % 360;
@@ -211,11 +217,16 @@ short getBearingAfterRoundabout(std::vector<RouteStep> steps, int roundabout_exi
             size_t out_index = steps[i].intersections[j].out;
             size_t in_index = steps[i].intersections[j].in;
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
+                short bearing_left = steps[i].intersections[j].bearings[in_index];
+                short bearing_right = steps[i].intersections[j].bearings[k];
+
+                if (bearing_left > bearing_right) {
+                    bearing_right += 360;
+                }
 
                 if (
                     !steps[i].intersections[j].entry[k]
-                    && (abs(steps[i].intersections[j].bearings[k] - steps[i].intersections[j].bearings[in_index]) < 65)
-                    && steps[i].intersections[j].bearings[k] > steps[i].intersections[j].bearings[in_index]
+                    && (bearing_right - bearing_left < 65)
                 ) {
                     return steps[i].intersections[j].bearings[out_index];
                 }
