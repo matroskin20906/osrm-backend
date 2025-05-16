@@ -171,6 +171,11 @@ void processRoundaboutGroups(const std::pair<RouteStepIterator, RouteStepIterato
 
 short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_enter)
 {
+    size_t enter_bearing_delta = abs(steps[roundabout_enter].maneuver.bearing_before - steps[roundabout_enter].maneuver.bearing_after);
+    if (enter_bearing_delta > 85 && enter_bearing_delta < 95) {
+        return steps[roundabout_enter].maneuver.bearing_before;
+    }
+
     for (int i = roundabout_enter - 1; i >= 0; --i) {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
             size_t out_index = steps[i].intersections[j].out;
@@ -196,6 +201,11 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_en
 
 short getBearingAfterRoundabout(std::vector<RouteStep> steps, int roundabout_exit)
 {
+    size_t exit_bearing_delta = abs(steps[roundabout_exit].maneuver.bearing_before - steps[roundabout_exit].maneuver.bearing_after);
+    if (exit_bearing_delta > 85 && exit_bearing_delta < 95) {
+        return steps[roundabout_exit].maneuver.bearing_after;
+    }
+
     for (size_t i = roundabout_exit + 1; i < steps.size(); ++i) {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
             size_t out_index = steps[i].intersections[j].out;
