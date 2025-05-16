@@ -169,7 +169,7 @@ void processRoundaboutGroups(const std::pair<RouteStepIterator, RouteStepIterato
 
 } // namespace
 
-short getBearingBeforeRoundabout(std::vector<RouteStep> steps, short roundabout_enter)
+short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_enter)
 {
     for (int i = roundabout_enter - 1; i >= 0; --i) {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
@@ -194,7 +194,7 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, short roundabout_
     return steps[roundabout_enter].maneuver.bearing_before;
 }
 
-short getBearingAfterRoundabout(std::vector<RouteStep> steps, short roundabout_exit)
+short getBearingAfterRoundabout(std::vector<RouteStep> steps, int roundabout_exit)
 {
     for (size_t i = roundabout_exit + 1; i < steps.size(); ++i) {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
@@ -245,7 +245,7 @@ std::vector<RouteStep> handleRoundabouts(std::vector<RouteStep> steps)
     bool currently_on_roundabout = !entersRoundabout(first_roundabout_type->maneuver.instruction);
 
     short bearing_before_roundabout = 0;
-    short roundabout_enter = 0;
+    int roundabout_enter = 0;
     for (size_t i = 1; i < steps.size(); ++i) {
         if (entersRoundabout(steps[i].maneuver.instruction)) {
             roundabout_enter = i;
