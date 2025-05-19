@@ -179,11 +179,17 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_en
     {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j)
         {
+            if (steps[i].intersections[j].in == guidance::IntermediateIntersection::NO_INDEX
+                || steps[i].intersections[j].out == guidance::IntermediateIntersection::NO_INDEX)
+            {
+                continue;
+            }
+
             size_t in_index = steps[i].intersections[j].in;
             short bearing_right = steps[i].intersections[j].bearings[steps[i].intersections[j].out];
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k)
             {
-                if (k == steps[i].intersections[j].out)
+                if (k == steps[i].intersections[j].out || k == in_index)
                     continue;
 
                 short bearing_left = steps[i].intersections[j].bearings[k];
@@ -216,11 +222,17 @@ short getBearingAfterRoundabout(std::vector<RouteStep> steps, int roundabout_exi
     {
         for (size_t j = 0; j < steps[i].intersections.size(); ++j)
         {
+            if (steps[i].intersections[j].in == guidance::IntermediateIntersection::NO_INDEX
+                || steps[i].intersections[j].out == guidance::IntermediateIntersection::NO_INDEX)
+            {
+                continue;
+            }
+
             size_t out_index = steps[i].intersections[j].out;
             short bearing_left = steps[i].intersections[j].bearings[steps[i].intersections[j].in];
             for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k)
             {
-                if (k == steps[i].intersections[j].in)
+                if (k == steps[i].intersections[j].in || k == out_index)
                     continue;
 
                 short bearing_right = steps[i].intersections[j].bearings[k];
