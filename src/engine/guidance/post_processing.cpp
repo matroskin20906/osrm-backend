@@ -171,35 +171,36 @@ void processRoundaboutGroups(const std::pair<RouteStepIterator, RouteStepIterato
 
 short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_enter)
 {
-    size_t enter_bearing_delta = abs(steps[roundabout_enter].maneuver.bearing_before - steps[roundabout_enter].maneuver.bearing_after);
-    if (enter_bearing_delta > 85 && enter_bearing_delta < 95) {
+    short enter_bearing_delta = abs(steps[roundabout_enter].maneuver.bearing_before - steps[roundabout_enter].maneuver.bearing_after) % 180;
+    if (enter_bearing_delta > 85 && enter_bearing_delta < 95)
         return steps[roundabout_enter].maneuver.bearing_before;
-    }
 
-    for (int i = roundabout_enter - 1; i >= 0; --i) {
-        for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
-            size_t out_index = steps[i].intersections[j].out;
+    for (int i = roundabout_enter - 1; i >= 0; --i)
+    {
+        for (size_t j = 0; j < steps[i].intersections.size(); ++j)
+        {
             size_t in_index = steps[i].intersections[j].in;
-            for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
+            short bearing_right = steps[i].intersections[j].bearings[steps[i].intersections[j].out];
+            for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k)
+            {
+                if (k == steps[i].intersections[j].out)
+                    continue;
+
                 short bearing_left = steps[i].intersections[j].bearings[k];
-                short bearing_right = steps[i].intersections[i].bearings[out_index];
 
-                if (bearing_left > bearing_right) {
+                if (bearing_left > bearing_right)
                     bearing_right += 360;
-                }
 
-                if (
-                    !steps[i].intersections[j].entry[k]
-                    && (bearing_right - bearing_left < 65)
-                ) {
+                if (!steps[i].intersections[j].entry[k] && (bearing_right - bearing_left < 65))
+                {
                     // due to "in" format + 180 is needed to get real angle.
                     return (steps[i].intersections[j].bearings[in_index] + 180) % 360;
                 }
             }
         }
-        if (util::coordinate_calculation::greatCircleDistance(steps[i].maneuver.location, steps[roundabout_enter].maneuver.location) > 150) {
+
+        if (util::coordinate_calculation::greatCircleDistance(steps[i].maneuver.location, steps[roundabout_enter].maneuver.location) > 150)
             return steps[roundabout_enter].maneuver.bearing_before;
-        }
     }
 
     return steps[roundabout_enter].maneuver.bearing_before;
@@ -207,34 +208,33 @@ short getBearingBeforeRoundabout(std::vector<RouteStep> steps, int roundabout_en
 
 short getBearingAfterRoundabout(std::vector<RouteStep> steps, int roundabout_exit)
 {
-    size_t exit_bearing_delta = abs(steps[roundabout_exit].maneuver.bearing_before - steps[roundabout_exit].maneuver.bearing_after);
-    if (exit_bearing_delta > 85 && exit_bearing_delta < 95) {
+    short exit_bearing_delta = abs(steps[roundabout_exit].maneuver.bearing_before - steps[roundabout_exit].maneuver.bearing_after) % 180;
+    if (exit_bearing_delta > 85 && exit_bearing_delta < 95)
         return steps[roundabout_exit].maneuver.bearing_after;
-    }
 
-    for (size_t i = roundabout_exit + 1; i < steps.size(); ++i) {
-        for (size_t j = 0; j < steps[i].intersections.size(); ++j) {
+    for (size_t i = roundabout_exit + 1; i < steps.size(); ++i)
+    {
+        for (size_t j = 0; j < steps[i].intersections.size(); ++j)
+        {
             size_t out_index = steps[i].intersections[j].out;
-            size_t in_index = steps[i].intersections[j].in;
-            for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k) {
-                short bearing_left = steps[i].intersections[j].bearings[in_index];
+            short bearing_left = steps[i].intersections[j].bearings[steps[i].intersections[j].in];
+            for (size_t k = 0; k < steps[i].intersections[j].entry.size(); ++k)
+            {
+                if (k == steps[i].intersections[j].in)
+                    continue;
+
                 short bearing_right = steps[i].intersections[j].bearings[k];
 
-                if (bearing_left > bearing_right) {
+                if (bearing_left > bearing_right)
                     bearing_right += 360;
-                }
 
-                if (
-                    !steps[i].intersections[j].entry[k]
-                    && (bearing_right - bearing_left < 65)
-                ) {
+                if (!steps[i].intersections[j].entry[k] && (bearing_right - bearing_left < 65))
                     return steps[i].intersections[j].bearings[out_index];
-                }
             }
         }
-        if (util::coordinate_calculation::greatCircleDistance(steps[i].maneuver.location, steps[roundabout_exit].maneuver.location) > 150) {
+
+        if (util::coordinate_calculation::greatCircleDistance(steps[i].maneuver.location, steps[roundabout_exit].maneuver.location) > 150)
             return steps[roundabout_exit].maneuver.bearing_after;
-        }
     }
 
     return steps[roundabout_exit].maneuver.bearing_after;
@@ -267,19 +267,21 @@ std::vector<RouteStep> handleRoundabouts(std::vector<RouteStep> steps)
 
     short bearing_before_roundabout = 0;
     int roundabout_enter = 0;
-    for (size_t i = 1; i < steps.size(); ++i) {
-        if (entersRoundabout(steps[i].maneuver.instruction)) {
+    for (size_t i = 1; i < steps.size(); ++i)
+    {
+        if (entersRoundabout(steps[i].maneuver.instruction))
+        {
             roundabout_enter = i;
             bearing_before_roundabout = getBearingBeforeRoundabout(steps, roundabout_enter);
         }
-        if (leavesRoundabout(steps[i].maneuver.instruction)) {
+        if (leavesRoundabout(steps[i].maneuver.instruction))
+        {
             short bearing_after_roundabout = getBearingAfterRoundabout(steps, i);
             steps[i].maneuver.degrees = (180 - (bearing_after_roundabout - bearing_before_roundabout)) % 360;
-            if (steps[i].maneuver.degrees < 0) {
+            if (steps[i].maneuver.degrees < 0)
                 steps[i].maneuver.degrees += 360;
-            }
 
-            steps[roundabout_enter].maneuver.degrees  = steps[i].maneuver.degrees;
+            steps[roundabout_enter].maneuver.degrees = steps[i].maneuver.degrees;
         }
     }
 
